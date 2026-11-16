@@ -48,10 +48,11 @@ python -m app.main compare --file sample.txt
 
 ## Nhật ký học (blog)
 
-Quá trình học được viết lại mỗi ngày trong thư mục [`blog/`](blog/), theo tinh thần
-học công khai: mỗi bài gắn với đúng phần app vừa được làm xong.
+Quá trình học được viết lại mỗi ngày trên blog cá nhân
+[taiphanvan.dev](https://taiphanvan.dev/vi/blog), theo tinh thần học công khai:
+mỗi bài gắn với đúng phần app vừa được làm xong.
 
-- [Ngày 1: Bắt đầu học AI Engineer, và quyết định chỉ làm đúng một project](blog/2026-11-16-ngay-1-bat-dau.md)
+- Ngày 1 (16/11/2026): [Bắt đầu học AI Engineer, và quyết định chỉ làm đúng một project](https://taiphanvan.dev/vi/blog/ngay-1-bat-dau-hoc-ai-engineer)
 
 ## Quy tắc secret
 
