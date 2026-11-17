@@ -41,14 +41,14 @@ def _print_result(label: str, result: GenerationResult) -> None:
 
 
 def cmd_summarize(args) -> None:
-    client = GeminiClient()
+    client = GeminiClient(model=args.model)
     prompt = SUMMARIZE_PROMPT.format(text=_read_input(args))
     result = client.generate(prompt, temperature=args.temperature)
     _print_result("Tóm tắt", result)
 
 
 def cmd_compare(args) -> None:
-    client = GeminiClient()
+    client = GeminiClient(model=args.model)
     prompt = SUMMARIZE_PROMPT.format(text=_read_input(args))
     low = client.generate(prompt, temperature=0.2)
     high = client.generate(prompt, temperature=0.9)
@@ -69,6 +69,12 @@ def main() -> None:
         p = sub.add_parser(name)
         p.add_argument("--file", help="Đường dẫn file văn bản đầu vào")
         p.add_argument("--text", help="Nội dung đầu vào viết trực tiếp")
+        p.add_argument(
+            "--model",
+            default=None,
+            help="Model Gemini cho lần chạy này, ví dụ gemini-3.1-flash-lite. "
+            "Không truyền thì dùng GEMINI_MODEL trong .env",
+        )
         if name == "summarize":
             p.add_argument("--temperature", type=float, default=0.2)
 

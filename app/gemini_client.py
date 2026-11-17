@@ -25,8 +25,8 @@ class GenerationResult:
     total_tokens: int
 
     def estimated_cost_usd(self) -> float | None:
-        input_price = get_price_per_1m("input")
-        output_price = get_price_per_1m("output")
+        input_price = get_price_per_1m("input", self.model)
+        output_price = get_price_per_1m("output", self.model)
         if input_price is None or output_price is None:
             return None
         return (

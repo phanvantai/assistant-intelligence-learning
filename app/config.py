@@ -39,17 +39,32 @@ def get_model() -> str:
     return os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
 
 
-def get_price_per_1m(kind: str) -> float | None:
-    """Đơn giá USD cho 1 triệu token, do người dùng tự cấu hình trong .env.
+# Đơn giá Paid Standard (USD cho 1 triệu token, vào / ra), tra từ trang giá
+# chính thức của Google: https://ai.google.dev/gemini-api/docs/pricing
+# Kiểm tra ngày 2026-11-18. Giá thay đổi theo thời gian (ví dụ gemini-3.8-flash
+# tăng gấp đôi từ 2027-01-01), nên khi dùng lâu dài phải tra lại trang giá.
+MODEL_PRICES: dict[str, tuple[float, float]] = {
+    "gemini-3.5-flash-lite": (0.30, 2.50),
+    "gemini-3.1-flash-lite": (0.25, 1.50),
+    "gemini-3.8-flash": (0.75, 3.75),
+}
 
-    kind là 'input' hoặc 'output'. Trả về None nếu chưa cấu hình,
-    khi đó app chỉ hiện số token chứ không tính tiền.
+
+def get_price_per_1m(kind: str, model: str | None = None) -> float | None:
+    """Đơn giá USD cho 1 triệu token của một model.
+
+    Thứ tự ưu tiên: biến môi trường trong .env (nếu người dùng tự đặt) trước,
+    sau đó tới bảng giá MODEL_PRICES ở trên. Model lạ không có trong bảng giá
+    thì trả về None, khi đó app chỉ hiện số token chứ không tính tiền.
     """
     name = "GEMINI_INPUT_PRICE_PER_1M" if kind == "input" else "GEMINI_OUTPUT_PRICE_PER_1M"
     raw = os.environ.get(name, "").strip()
-    if not raw:
-        return None
-    try:
-        return float(raw)
-    except ValueError:
-        return None
+    if raw:
+        try:
+            return float(raw)
+        except ValueError:
+            return None
+    if model and model in MODEL_PRICES:
+        input_price, output_price = MODEL_PRICES[model]
+        return input_price if kind == "input" else output_price
+    return None

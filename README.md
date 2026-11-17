@@ -28,7 +28,11 @@ thành việc làm được.
 - `app/main.py`: giao diện dòng lệnh với hai lệnh `summarize` và `compare`.
   Lệnh `compare` là phần thực hành của Bài 1 (token, context window, temperature):
   cùng một nội dung chạy ở temperature 0.2 và 0.9, xem hai kết quả cạnh nhau.
+  Cả hai lệnh đều nhận tuỳ chọn `--model` để chọn model cho từng lần chạy (Bài 2).
 - `app/config.py`: đọc API key từ biến môi trường hoặc file `.env`. Key không nằm trong code.
+  File này cũng giữ bảng giá chính thức của Google cho các model đã biết
+  (`MODEL_PRICES`, kiểm tra 2026-11-18) để app tính chi phí ước tính sau mỗi lần gọi;
+  model lạ chưa có giá thì app chỉ hiện token.
 
 Chưa có (thuộc các phần học sau của Giai đoạn 0): giao diện web, streaming, FastAPI.
 
