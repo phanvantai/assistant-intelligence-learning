@@ -3,6 +3,7 @@
 Cách dùng:
   python -m app.main summarize --file sample.txt
   python -m app.main summarize --text "nội dung cần tóm tắt" --temperature 0.2
+  python -m app.main summarize --file sample.txt --stream
   python -m app.main compare --file sample.txt
 
 Lệnh compare là phần thực hành của Bài 1: cùng một nội dung, chạy ở
@@ -29,9 +30,7 @@ def _read_input(args) -> str:
     raise SystemExit("Cần --file hoặc --text để có nội dung đầu vào.")
 
 
-def _print_result(label: str, result: GenerationResult) -> None:
-    print(f"\n--- {label} (model: {result.model}, temperature: {result.temperature}) ---")
-    print(result.text)
+def _print_usage(result: GenerationResult) -> None:
     cost = result.estimated_cost_usd()
     cost_text = f", chi phí ước tính: ${cost:.6f}" if cost is not None else ""
     print(
@@ -40,9 +39,36 @@ def _print_result(label: str, result: GenerationResult) -> None:
     )
 
 
+def _print_result(label: str, result: GenerationResult) -> None:
+    print(f"\n--- {label} (model: {result.model}, temperature: {result.temperature}) ---")
+    print(result.text)
+    _print_usage(result)
+
+
 def cmd_summarize(args) -> None:
     client = GeminiClient(model=args.model)
     prompt = SUMMARIZE_PROMPT.format(text=_read_input(args))
+    if args.stream:
+        # Chế độ streaming (Bài 3): in tiêu đề trước, chữ chạy ra tới đâu in
+        # tới đó, dòng token/chi phí chỉ in khi stream đã xong. Nếu stream
+        # đứt giữa chừng, phần chữ đã in vẫn ở trên màn hình nhưng lần chạy
+        # báo lỗi rõ ràng và thoát với mã 1.
+        print(
+            f"\n--- Tóm tắt (streaming) (model: {client.model}, "
+            f"temperature: {args.temperature}) ---"
+        )
+        try:
+            result = client.generate_stream(
+                prompt,
+                temperature=args.temperature,
+                on_text=lambda chunk: print(chunk, end="", flush=True),
+            )
+        except RuntimeError as error:
+            print(f"\n[Lỗi] {error}", file=sys.stderr)
+            raise SystemExit(1) from error
+        print()
+        _print_usage(result)
+        return
     result = client.generate(prompt, temperature=args.temperature)
     _print_result("Tóm tắt", result)
 
@@ -77,6 +103,12 @@ def main() -> None:
         )
         if name == "summarize":
             p.add_argument("--temperature", type=float, default=0.2)
+            p.add_argument(
+                "--stream",
+                action="store_true",
+                help="Trả kết quả dạng streaming: chữ hiện dần theo từng mẩu "
+                "thay vì chờ nguyên bản tóm tắt (Bài 3)",
+            )
 
     args = parser.parse_args()
     if args.command == "summarize":

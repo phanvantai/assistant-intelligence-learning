@@ -33,6 +33,10 @@ thành việc làm được.
   File này cũng giữ bảng giá chính thức của Google cho các model đã biết
   (`MODEL_PRICES`, kiểm tra 2026-11-18) để app tính chi phí ước tính sau mỗi lần gọi;
   model lạ chưa có giá thì app chỉ hiện token.
+- Streaming (Bài 3): lệnh `summarize` có tuỳ chọn `--stream` — app nhận kết quả
+  theo từng mẩu chữ qua SSE và in ngay khi nhận, dòng token/chi phí in ở cuối
+  khi sự kiện `interaction.completed` về. Stream đứt giữa chừng được coi là
+  lần gọi thất bại, không tính là kết quả hoàn chỉnh.
 
 Chưa có (thuộc các phần học sau của Giai đoạn 0): giao diện web, streaming, FastAPI.
 
